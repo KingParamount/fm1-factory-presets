@@ -1,0 +1,56 @@
+M-VAVE FM-1 factory voices traced to Yamaha DX7 factory cartridges
+
+Reference pool: the complete DX7 factory set, ROM1A-4B and VRC101A-112B
+(32 banks, 1024 voices, 994 unique parameter sets) from yamahablackboxes.com.
+Comparison is over the 112 parameter bytes of each packed voice; the 10-byte
+name field is excluded and reported separately.
+
+Confidence:  certain      = all 112 parameter bytes identical
+             near-certain = 1-5 bytes differ and the names correspond
+             probable     = 6-15 bytes differ and the names correspond
+
+slot | FM-1 name  | diff | source        | original name | confidence
+----------------------------------------------------------------------------
+   0 | PIANO 1    |    0 | ROM1A v11     | E.PIANO 1     | certain
+   1 | ORGAN 1    |    6 | ROM1A v17     | E.ORGAN 1     | probable
+   8 | PIANO3     |    0 | ROM3B v06     | E.PIANO 3     | certain
+  10 | SYN LEAD 3 |    6 | ROM4B v12     | LEAD GUITR    | probable
+  12 | PIANO 4    |    0 | ROM3B v07     | E.PIANO 4     | certain
+  16 | PIANO 5    |    8 | ROM1A v11     | E.PIANO 1     | probable
+  17 | ORGAN 5    |    0 | ROM3B v13     | E.ORGAN 2     | certain
+  21 | ORGAN 6    |    0 | ROM3B v14     | E.ORGAN 3     | certain
+  24 | PIANO 7    |    4 | VRC101A v09     | E.PIANO  3    | near-certain
+  25 | ORGAN 7    |    6 | ROM1B v15     | E.ORGAN 4     | probable
+  28 | PIANO 8    |    4 | VRC101A v10     | E.PIANO  4    | near-certain
+  33 | DS GUITAR1 |    0 | VRC109A v22     | DIST.GUIT     | certain
+  40 | GUITAR 3   |    0 | ROM1B v28     | BANJO         | certain
+  42 | BASS 3     |    2 | ROM1B v32     | BASS    4     | near-certain
+  45 | DS GUITAR4 |    0 | VRC101A v26     | E.GUITAR 2    | certain
+  48 | GUITAR 5   |    6 | ROM3A v15     | JAZZ GUIT1    | probable
+  52 | GUITAR 6   |    0 | ROM3B v25     | FOLK GUIT     | certain
+  53 | DS GUITAR6 |    5 | ROM3A v21     | HEAVYMETAL    | probable
+  55 | SYN BASS6  |   12 | VRC106B v04     | SYN.BASS10    | probable
+  56 | GUITAR 7   |    0 | ROM1B v23     | GUITAR  3     | certain
+  57 | DS GUITAR7 |   11 | ROM4B v12     | LEAD GUITR    | probable
+  65 | WOODWIND 1 |    0 | VRC102A v17     | BASSOON  3    | certain
+  69 | WOODWIND 2 |    0 | VRC102A v15     | BASSOON  1    | certain
+  70 | STRING 2   |    0 | ROM3A v03     | STRG ENS 1    | certain
+  77 | WOODWIND 4 |    0 | VRC102A v09     | OBOE     2    | certain
+  78 | STRING 4   |    4 | ROM1A v05     | STRINGS 2     | near-certain
+  80 | BRASS 5    |    0 | VRC102A v23     | HORN     2    | certain
+  86 | STRING 6   |    0 | ROM4A v14     | STRG ENS 2    | certain
+  87 | VOICE 6    |    4 | ROM2A v21     | VOICE   3     | near-certain
+  89 | WOODWIND 7 |    0 | ROM1B v21     | ACCORDION     | certain
+  98 | BLOCK      |    0 | ROM2A v30     | BLOCK         | certain
+ 105 | LOG DRUM   |    0 | ROM4A v30     | LOG DRUM      | certain
+ 106 | COWBELL    |    0 | ROM2A v29     | COW BELL      | certain
+ 109 | TIMPANI    |    0 | ROM3A v20     | TIMPANI       | certain
+ 110 | TAMBOURINE |    4 | VRC104B v05     | TAMBLN.  1    | near-certain
+ 111 | DESCENT    |    0 | ROM2B v28     | DESCENT       | certain
+ 113 | STEEL DRUM |    1 | ROM3A v22     | STEEL DRUM    | near-certain
+ 116 | BI   BEN   |    4 | VRC105B v18     | BIG BEN       | near-certain
+ 120 | TUB BELLS  |    0 | ROM1A v26     | TUB BELLS     | certain
+ 125 | TIMBALI    |    4 | VRC104A v16     | TIMBALES 2    | near-certain
+----------------------------------------------------------------------------
+23 certain, 9 near-certain, 8 probable = 40 of 128
+88 voices have no counterpart in the official Yamaha factory set.
