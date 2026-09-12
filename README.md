@@ -1,3 +1,9 @@
+## The tutorial
+
+[`FM-1-tutorial.pdf`](FM-1-tutorial.pdf) teaches FM synthesis on this
+instrument from a sine wave upwards, in twelve chapters, checked against
+firmware v15. Released under CC BY-SA 4.0.
+
 # M-VAVE FM-1 factory presets
 
 The M-VAVE FM-1 receives SysEx but never sends it. Once you overwrite the factory presets with DX7 banks, they are gone: the onboard factory reset restores whatever was last imported, not the original set. The only route back is M-VAVE's Chinese-language updater, which also downgrades your firmware to v14.
