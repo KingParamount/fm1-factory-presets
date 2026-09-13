@@ -6,7 +6,7 @@ firmware v15. Released under CC BY-SA 4.0.
 
 # M-VAVE FM-1 factory presets
 
-The M-VAVE FM-1 receives SysEx but never sends it. Once you overwrite the factory presets with DX7 banks, they are gone: the onboard factory reset restores whatever was last imported, not the original set. The only route back is M-VAVE's Chinese-language updater, which also downgrades your firmware to v14.
+The FM-1 never initiates SysEx, and never transmits voice data. It does reply when spoken to: an identity response, and an acknowledgement per block. Once you overwrite the factory presets with DX7 banks, they are gone: the onboard factory reset restores whatever was last imported, not the original set. The only route back is M-VAVE's Chinese-language updater, which also downgrades your firmware to v14.
 
 This repository has the factory set recovered as four standard DX7 bank dumps, so you can put it back with Dexed, PocketMIDI or any SysEx utility, with no updater and no firmware downgrade.
 
