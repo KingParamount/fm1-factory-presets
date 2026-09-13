@@ -10,33 +10,77 @@ This is a capture and decode of what that tool sends, the resulting banks as sta
 
 On macOS, outbound traffic to a MIDI destination is not visible to other applications, so a port monitor that only reads sources will show nothing. Snoize's MIDI Monitor has a spy driver that hooks the destination side. Enable "spy on output to destinations" in its Sources pane, install the helper when prompted, restart the app, then tick the FM-1 under destinations.
 
-With the FM-1 connected over USB and the log cleared, pressing restore in the Chinese tool produces 46 SysEx messages in about 200 milliseconds.
+With the FM-1 connected over USB and the log cleared, pressing restore in the Chinese tool produces 48 SysEx rows in about 200 milliseconds. Four of those are the identify message appearing on IAC Driver Bus 1, which is the tool polling every MIDI destination it can see rather than FM-1 traffic. The remaining 44 are the restore itself.
 
 ## The protocol
 
-M-VAVE use manufacturer ID `00 32 xx`, not Yamaha's `43`, so none of it is DX7-compatible on the wire.
+M-VAVE use manufacturer ID `00 32`, not Yamaha's `43`, so none of it is
+DX7-compatible on the wire. The byte after `00 32` differs by message type:
+`45` for identify, `05` for setup, `09` for a voice block and `01` for an
+acknowledgement. A device with four manufacturer IDs is unlikely, so it reads
+as a command byte, though nothing in the capture confirms that.
 
-The tool first identifies the device:
+The 44 messages of the restore break down as follows:
 
-```
--> F0 00 32 45 00 00 00 40 7F F7
-<- F0 00 32 45 58 01 00 00 23 4D 5A 44 79 05 26 4C 1A 00 ... 20 06 F7
-```
+| Count | Direction   | Message      |
+| ----- | ----------- | ------------ |
+| 2     | host to FM-1 | identify     |
+| 2     | FM-1 to host | identity reply |
+| 4     | host to FM-1 | setup        |
+| 4     | FM-1 to host | acknowledgement |
+| 16    | host to FM-1 | voice block  |
+| 16    | FM-1 to host | acknowledgement |
 
-The reply contains the ASCII string `#MZD` followed by what appears to be a version or serial. Then four short setup messages, each acknowledged, before the bank data itself:
+The tool identifies the device first, and does so twice in a row before moving
+on:
+-> F0 00 32 45 00 00 00 40 7F F7 <- F0 00 32 45 58 01 00 00 23 4D 5A 44 79 05 26 4C 1A 00 ... 20 06 F7
 
-```
--> F0 00 32 09 41 40 00 40 02 00 SS 00 00 00 00 01 | payload | CK F7   (1190 bytes)
-<- F0 00 32 01 08 00 00 00 00 7F 01 F7                                 (ack)
-```
 
-`SS` is the target slot, running `00 08 10 18 ... 78`. Sixteen messages of eight voices each covers all 128 presets. Each is acknowledged before the next is sent.
+The reply is 41 bytes, mostly zeros. It contains the ASCII string `#MZD`
+followed by five bytes that may be a version, a serial, or both. Anyone
+publishing their own capture may want to mask those.
 
-Subtracting the sixteen header bytes and one trailing checksum byte leaves 1171 payload bytes. That is a continuous 7-bit bitstream, LSB-first at both the septet and the reassembled-byte level, which unpacks to exactly 1024 bytes. Neither of the two conventional MIDI packing schemes will decode it: not the byte-aligned MSB-group format used by Roland and Akai, and not an MSB-first bitstream.
+Four setup messages follow, each acknowledged:
 
-Those 1024 bytes are eight standard 128-byte packed DX7 voices. Algorithm, feedback and transpose all sit at their usual offsets and fall within legal ranges, and the ten-character name field lands at byte 118 of each voice.
+-> F0 00 32 05 29 00 00 40 02 00 00 00 00 20 1F F7 -> F0 00 32 05 29 00 00 40 02 00 20 00 00 20 1D F7 -> F0 00 32 05 29 00 00 40 02 00 40 00 00 20 1B F7 -> F0 00 32 05 29 00 00 40 02 00 60 00 00 20 19 F7 <- F0 00 32 01 08 00 00 00 00 7F 01 F7 (ack, after each)
 
-The signature that gives away the packing is a run like `0C 1B 36 6C 58 31 63 46` inside the raw payload. Each value is the previous one doubled with carry, which is what a byte-aligned pattern looks like after being re-windowed into 7-bit chunks.
+Only the tenth byte changes, running `00 20 40 60`. Those are slots 0, 32, 64
+and 96, one per bank of 32 voices, addressed the same way the voice blocks are.
+What the message asks the device to do is unknown. Nothing else in the four
+is published anywhere, and none of it has been tested.
+
+Then the voice data, sixteen messages, each acknowledged before the next is
+sent:
+
+-> F0 00 32 09 41 40 00 40 02 00 SS 00 00 00 00 01 00 | payload | CK F7 (1190 bytes) <- F0 00 32 01 08 00 00 00 00 7F 01 F7 (ack)
+
+
+`SS` is the target slot, running `00 08 10 18 ... 78`. Sixteen messages of
+eight voices each covers all 128 presets.
+
+The message is `F0`, a 16-byte header, 1171 payload bytes, one checksum byte
+and `F7`, which is 1190. How `CK` is calculated is not known. Summing and
+XORing the header, the payload or the decoded data, in both plain and
+two's-complement form, produces nothing that matches across all sixteen
+blocks.
+
+The 1171 payload bytes are a continuous 7-bit bitstream, LSB-first at both the
+septet and the reassembled-byte level, which unpacks to exactly 1024 bytes.
+Neither of the two conventional MIDI packing schemes will decode it: not the
+byte-aligned MSB-group format used by Roland and Akai, and not an MSB-first
+bitstream.
+
+Those 1024 bytes are eight standard 128-byte packed DX7 voices. Algorithm,
+feedback and transpose all sit at their usual offsets and fall within legal
+ranges, and the ten-character name field lands at byte 118 of each voice. The
+header length is confirmed by the decode rather than by counting: at 16 bytes
+the first block reads PIANO 1, ORGAN 1, SYN LEAD 1, and at 15 or 17 it reads
+nothing at all.
+
+The signature that gives away the packing is a run like
+`0C 1B 36 6C 58 31 63 46` inside the raw payload. Each value is the previous
+one doubled with carry, which is what a byte-aligned pattern looks like after
+being re-windowed into 7-bit chunks.
 
 ## Rebuilding as DX7 banks
 
